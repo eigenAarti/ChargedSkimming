@@ -4,6 +4,7 @@
 #include <ChargedSkimming/Skimming/interface/metfilteranalyzer.h>
 #include <ChargedSkimming/Skimming/interface/electronanalyzer.h>
 #include <ChargedSkimming/Skimming/interface/muonanalyzer.h>
+#include <ChargedSkimming/Skimming/interface/tauanalyzer.h>
 #include <ChargedSkimming/Skimming/interface/jetanalyzer.h>
 #include <ChargedSkimming/Skimming/interface/genpartanalyzer.h>
 #include <ChargedSkimming/Skimming/interface/weightanalyzer.h>
@@ -36,15 +37,17 @@ void NanoSkimmer::ProgressBar(const int &progress){
 
 }
 
-void NanoSkimmer::Configure(const float &xSec, TTreeReader& reader){
+void NanoSkimmer::Configure(const float &xSec, TTreeReader& reader){		//value of "channels" is passed as argument
     analyzers = {
         std::shared_ptr<WeightAnalyzer>(new WeightAnalyzer(2017, xSec, reader)),
         std::shared_ptr<TriggerAnalyzer>(new TriggerAnalyzer({"HLT_IsoMu27"}, {"HLT_Ele35_WPTight_Gsf", "HLT_Ele28_eta2p1_WPTight_Gsf_HT150", "HLT_Ele30_eta2p1_WPTight_Gsf_CentralPFJet35_EleCleaned"}, {}, reader)),
+//        std::shared_ptr<TriggerAnalyzer>(new TriggerAnalyzer({"HLT_IsoMu27"}, reader)),
         std::shared_ptr<MetFilterAnalyzer>(new MetFilterAnalyzer(2017, reader)),
         std::shared_ptr<JetAnalyzer>(new JetAnalyzer(2017, 30., 2.4, reader)),
         std::shared_ptr<MuonAnalyzer>(new MuonAnalyzer(2017, 25., 2.4, reader)),
         std::shared_ptr<ElectronAnalyzer>(new ElectronAnalyzer(2017, 20., 2.4, reader)),
-        std::shared_ptr<GenPartAnalyzer>(new GenPartAnalyzer(reader, {}))
+	std::shared_ptr<TauAnalyzer>(new TauAnalyzer(2017, 20., 2.3, reader)),
+        std::shared_ptr<GenPartAnalyzer>(new GenPartAnalyzer(reader, {})) 
     };
 }
 
@@ -57,13 +60,15 @@ void NanoSkimmer::EventLoop(const std::vector<std::string> &channels, const floa
 
     Configure(xSec, reader);
 
-    nMin = {
-            {"mu4j", {1, 0, 4, 0}},
-            {"e4j", {0, 1, 4, 0}},
-            {"mu2j1f", {1, 0, 2, 1}},
-            {"e2j1f", {0, 1, 2, 1}},
-            {"mu2f", {1, 0, 0, 2}},
-            {"e2f", {0, 1, 0, 2}},
+    nMin = {			//this is an std::map; the arrays don't mean anything at this point, but described below in variable "channel"
+            {"mu4j", {1, 0, 4, 0, 0}},
+            {"e4j", {0, 1, 4, 0, 0}},
+            {"mu2j1f", {1, 0, 2, 1, 0}},
+            {"e2j1f", {0, 1, 2, 1, 0}},
+            {"mu2f", {1, 0, 0, 2, 0}},
+            {"e2f", {0, 1, 0, 2, 0}},
+	    {"mu2j2tau", {1, 0, 2, 0, 2}},
+            {"e2j2tau", {0, 1, 2, 0, 2}},
     };
 
     for(const std::string &channel: channels){
@@ -84,10 +89,11 @@ void NanoSkimmer::EventLoop(const std::vector<std::string> &channels, const floa
         cutflow.nMinEle=nMin[channel][1];
         cutflow.nMinJet=nMin[channel][2];
         cutflow.nMinFatjet=nMin[channel][3];
+	cutflow.nMinTau=nMin[channel][4];
         
         cutflow.weight = 1;    
 
-        cutflows.push_back(cutflow); 
+       //cutflows.push_back(cutflow);
     }
 
     //Begin jobs for all analyzers
@@ -96,27 +102,27 @@ void NanoSkimmer::EventLoop(const std::vector<std::string> &channels, const floa
     }
 
     //Progress bar at 0%
-    int processed = 0;
+    //int processed = 0;
     ProgressBar(0.);
 
-    while(reader.Next()){
+    /*while(reader.Next()){
         //Call each analyzer
         for(unsigned int i = 0; i < analyzers.size(); i++){
             unsigned int nFailed = 0;
             analyzers[i]->Analyze(cutflows);
 
-            //If for all channels one analyzer failes, reject event
-        for(CutFlow &cutflow: cutflows){
+            //If for all channels (final states) one analyzer fails, reject event
+            for(CutFlow &cutflow: cutflows){
                 if(!cutflow.passed) nFailed++;
             }
 
-            //If for all channels one analyzer failes, reject event
+            //If for all channels one analyzer fails, reject event
             if(nFailed == cutflows.size()){
                 break;
             }       
         }
 
-        //Check individual for each channel, if event should be filled
+        //Check individually for each channel, if event should be filled
         for(unsigned int i = 0; i < outputTrees.size(); i++){
             if(cutflows[i].passed){
                 outputTrees[i]->Fill();
@@ -131,7 +137,7 @@ void NanoSkimmer::EventLoop(const std::vector<std::string> &channels, const floa
             int progress = 100*(float)processed/eventTree->GetEntries();
             ProgressBar(progress);        
         }
-    }
+    }*/
 
     ProgressBar(100);
 

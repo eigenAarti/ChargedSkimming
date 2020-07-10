@@ -18,6 +18,7 @@ void BaseAnalyzer::SetCollection(bool &isData){
         genStatus = std::make_unique<TTreeReaderArray<int>>(*reader, "GenPart_statusFlags");
         eleGenIdx = std::make_unique<TTreeReaderArray<int>>(*reader, "Electron_genPartIdx");
         muonGenIdx = std::make_unique<TTreeReaderArray<int>>(*reader, "Muon_genPartIdx");
+        tauGenIdx = std::make_unique<TTreeReaderArray<int>>(*reader, "Tau_genPartIdx");
     }
 
     run = std::make_unique<TTreeReaderValue<unsigned int>>(*reader, "run");
@@ -84,7 +85,7 @@ std::tuple<int, int, int> BaseAnalyzer::SetGenParticles(const float& pt, const f
     }  
 
     std::map<int, int> genIndex;
-    if(isNANO) genIndex = {{11, eleGenIdx->At(i)}, {13, muonGenIdx->At(i)}};
+    if(isNANO) genIndex = {{11, eleGenIdx->At(i)}, {13, muonGenIdx->At(i)}, {15, tauGenIdx->At(i)}};
 
     bool isgenMatched = isNANO ? genIndex[pdgID] != -1 : matchedLep!=nullptr;
 

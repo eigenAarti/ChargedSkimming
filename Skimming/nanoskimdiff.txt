@@ -1,0 +1,40 @@
+7d6
+< #include <ChargedSkimming/Skimming/interface/tauanalyzer.h>
+40c39
+< void NanoSkimmer::Configure(const float &xSec, TTreeReader& reader){		//value of "channels" is passed as argument
+---
+> void NanoSkimmer::Configure(const float &xSec, TTreeReader& reader){
+49d47
+< 	std::shared_ptr<TauAnalyzer>(new TauAnalyzer(2017, 20., 2.3, reader)),
+63,71c61,67
+<     nMin = {			//this is an std::map; the arrays don't mean anything at this point, but described below in variable "channel"
+<             {"mu4j", {1, 0, 4, 0, 0}},
+<             {"e4j", {0, 1, 4, 0, 0}},
+<             {"mu2j1f", {1, 0, 2, 1, 0}},
+<             {"e2j1f", {0, 1, 2, 1, 0}},
+<             {"mu2f", {1, 0, 0, 2, 0}},
+<             {"e2f", {0, 1, 0, 2, 0}},
+< 	    {"mu2j2tau", {1, 0, 2, 0, 2}},         
+<             {"e2j2tau", {0, 1, 2, 0, 2}},
+---
+>     nMin = {
+>             {"mu4j", {1, 0, 4, 0}},
+>             {"e4j", {0, 1, 4, 0}},
+>             {"mu2j1f", {1, 0, 2, 1}},
+>             {"e2j1f", {0, 1, 2, 1}},
+>             {"mu2f", {1, 0, 0, 2}},
+>             {"e2f", {0, 1, 0, 2}},
+92d87
+< 	cutflow.nMinTau=nMin[channel][4];
+114c109
+<             //If for all channels (final states) one analyzer fails, reject event
+---
+>             //If for all channels one analyzer failes, reject event
+119c114
+<             //If for all channels one analyzer fails, reject event
+---
+>             //If for all channels one analyzer failes, reject event
+125c120
+<         //Check individually for each channel, if event should be filled
+---
+>         //Check individual for each channel, if event should be filled

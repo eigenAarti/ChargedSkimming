@@ -8,6 +8,7 @@
 #include <bitset>
 
 #include <TFile.h>
+#include <TF1.h>
 #include <TH1F.h>
 #include <TH2F.h>
 #include <Rtypes.h>
@@ -34,6 +35,7 @@ struct CutFlow {
 
     unsigned char nMinEle=0;
     unsigned char nMinMu=0;
+    unsigned char nMinTau=0;
     unsigned char nMinJet=0;
     unsigned char nMinFatjet=0;
     
@@ -65,7 +67,7 @@ class BaseAnalyzer {
         std::unique_ptr<TTreeReaderArray<int>> trigObjID, trigObjFilterBit;
     
         std::unique_ptr<TTreeReaderArray<float>> genPhi, genEta, genPt, genMass;
-        std::unique_ptr<TTreeReaderArray<int>> genID, genMotherIdx, genStatus, eleGenIdx, muonGenIdx;
+        std::unique_ptr<TTreeReaderArray<int>> genID, genMotherIdx, genStatus, eleGenIdx, muonGenIdx, tauGenIdx;
 
         //Set trihObj and Gen particle collection
         void SetCollection(bool &isData);
