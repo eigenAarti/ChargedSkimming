@@ -71,6 +71,7 @@ void NanoSkimmer::EventLoop(const std::vector<std::string> &channels, const floa
             {"e2j2tau", {0, 1, 2, 0, 2}},
     };
 
+
     for(const std::string &channel: channels){
         //Create output trees
         TTree* tree = new TTree();
@@ -91,9 +92,12 @@ void NanoSkimmer::EventLoop(const std::vector<std::string> &channels, const floa
         cutflow.nMinFatjet=nMin[channel][3];
 	cutflow.nMinTau=nMin[channel][4];
         
-        cutflow.weight = 1;    
+        cutflow.weight = 1;
 
-       //cutflows.push_back(cutflow);
+
+
+        cutflows.push_back(cutflow);
+
     }
 
     //Begin jobs for all analyzers
@@ -102,10 +106,10 @@ void NanoSkimmer::EventLoop(const std::vector<std::string> &channels, const floa
     }
 
     //Progress bar at 0%
-    //int processed = 0;
+    int processed = 0;
     ProgressBar(0.);
 
-    /*while(reader.Next()){
+    while(reader.Next()){
         //Call each analyzer
         for(unsigned int i = 0; i < analyzers.size(); i++){
             unsigned int nFailed = 0;
@@ -137,7 +141,7 @@ void NanoSkimmer::EventLoop(const std::vector<std::string> &channels, const floa
             int progress = 100*(float)processed/eventTree->GetEntries();
             ProgressBar(progress);        
         }
-    }*/
+    }
 
     ProgressBar(100);
 
@@ -159,10 +163,10 @@ void NanoSkimmer::WriteOutput(const std::string &outFile){
         analyzers[i]->EndJob(file);
     }
 
-    for(CutFlow& cutflow: cutflows){
-        cutflow.hist->Write();
-        delete cutflow.hist;
-    }
+    //for(CutFlow& cutflow: cutflows){
+    //    cutflow.hist->Write();
+    //    delete cutflow.hist;
+    //}
 
     file->Write();
     file->Close();
